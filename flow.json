@@ -1,0 +1,61 @@
+{
+  "contracts": {
+    "Events": "./contracts/Events.cdc",
+    "InsuranceVault": "./contracts/InsuranceVault.cdc",
+    "Scheduler": "./contracts/Scheduler.cdc",
+    "InsuredAction": "./contracts/InsuredAction.cdc",
+    "FungibleToken": {
+      "source": "mainnet://0xf233dcee88fe0abe.FungibleToken",
+      "aliases": {
+        "testnet": "0x9a0766d93b6608b7",
+        "emulator": "0xee82856bf20e2aa6"
+      }
+    },
+    "FlowToken": {
+      "source": "mainnet://0x1654653399040a61.FlowToken",
+      "aliases": {
+        "testnet": "0x7e60df042a9c0868",
+        "emulator": "0x0ae53cb6e3f42a79"
+      }
+    }
+  },
+  "networks": {
+    "emulator": "127.0.0.1:3569",
+    "mainnet": "access.mainnet.nodes.onflow.org:9000",
+    "testnet": "access.devnet.nodes.onflow.org:9000"
+  },
+  "accounts": {
+    "emulator-account": {
+      "address": "f8d6e0586b0a20c7",
+      "key": "ae1b44c0f5e8f6992ef2348898a35e50a8b0b9684000da483c3fb0e91e3a0a4b"
+    },
+    "testnet-account": {
+      "address": "SERVICE_ACCOUNT_ADDRESS",
+      "key": {
+        "type": "hex",
+        "index": 0,
+        "signatureAlgorithm": "ECDSA_P256",
+        "hashAlgorithm": "SHA3_256",
+        "privateKey": "SERVICE_ACCOUNT_PRIVATE_KEY"
+      }
+    }
+  },
+  "deployments": {
+    "emulator": {
+      "emulator-account": [
+        "Events",
+        "InsuranceVault",
+        "Scheduler",
+        "InsuredAction"
+      ]
+    },
+    "testnet": {
+      "testnet-account": [
+        "Events",
+        "InsuranceVault",
+        "Scheduler",
+        "InsuredAction"
+      ]
+    }
+  }
+}
