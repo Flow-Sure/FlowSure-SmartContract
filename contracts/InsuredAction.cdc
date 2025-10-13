@@ -1,13 +1,45 @@
-import Events from "./Events.cdc"
 import InsuranceVault from "./InsuranceVault.cdc"
 import Scheduler from "./Scheduler.cdc"
+import FrothRewards from "./FrothRewards.cdc"
+import DapperAssetProtection from "./DapperAssetProtection.cdc"
 
 access(all) contract InsuredAction {
+    
+    access(all) event TransactionStatusEvent(
+        user: Address,
+        actionId: String,
+        status: String,
+        retries: UInt8,
+        timestamp: UFix64
+    )
+    
+    access(all) event CompensationEvent(
+        user: Address,
+        actionId: String,
+        amount: UFix64,
+        timestamp: UFix64
+    )
+    
+    access(all) event ActionSuccessEvent(
+        user: Address,
+        actionId: String,
+        targetAction: String,
+        timestamp: UFix64
+    )
+    
+    access(all) event ActionFailureEvent(
+        user: Address,
+        actionId: String,
+        targetAction: String,
+        error: String,
+        timestamp: UFix64
+    )
     
     access(all) let ActionManagerStoragePath: StoragePath
     
     access(all) var defaultRetryDelay: UFix64
     access(all) var defaultCompensationAmount: UFix64
+    access(all) var defaultInsuranceFee: UFix64
     access(all) var totalActionsExecuted: UInt64
     access(all) var totalActionsSucceeded: UInt64
     access(all) var totalActionsFailed: UInt64
@@ -62,6 +94,8 @@ access(all) contract InsuredAction {
             params: {String: AnyStruct},
             retryLimit: UInt8
         ): String {
+            let baseFee = InsuredAction.defaultInsuranceFee
+            let finalFee = FrothRewards.calculateDiscountedFee(baseFee: baseFee, user: user)
             self.actionCounter = self.actionCounter + 1
             let actionId = "action_".concat(self.actionCounter.toString())
             
@@ -122,6 +156,12 @@ access(all) contract InsuredAction {
                     return self.simulateNFTMint(params: params)
                 case "token_transfer":
                     return self.simulateTokenTransfer(params: params)
+                case "dapper_nft_mint":
+                    return self.simulateDapperNFTMint(params: params)
+                case "dapper_pack_opening":
+                    return self.simulateDapperPackOpening(params: params)
+                case "dapper_nft_transfer":
+                    return self.simulateDapperNFTTransfer(params: params)
                 default:
                     return ActionResult(
                         success: false,
@@ -185,6 +225,63 @@ access(all) contract InsuredAction {
             )
         }
         
+        access(self) fun simulateDapperNFTMint(params: {String: AnyStruct}): ActionResult {
+            let shouldFail = params["shouldFail"] as? Bool ?? false
+            let assetType = params["assetType"] as? String ?? "NBA_TOP_SHOT"
+            
+            if shouldFail {
+                return ActionResult(
+                    success: false,
+                    message: "Dapper NFT mint failed: Network congestion",
+                    data: nil
+                )
+            }
+            
+            return ActionResult(
+                success: true,
+                message: "Dapper NFT minted successfully",
+                data: {"assetType": assetType, "nftId": "dapper_nft_123"}
+            )
+        }
+        
+        access(self) fun simulateDapperPackOpening(params: {String: AnyStruct}): ActionResult {
+            let shouldFail = params["shouldFail"] as? Bool ?? false
+            let assetType = params["assetType"] as? String ?? "NBA_TOP_SHOT"
+            
+            if shouldFail {
+                return ActionResult(
+                    success: false,
+                    message: "Dapper pack opening failed: Transaction timeout",
+                    data: nil
+                )
+            }
+            
+            return ActionResult(
+                success: true,
+                message: "Dapper pack opened successfully",
+                data: {"assetType": assetType, "packId": "pack_456", "items": "3"}
+            )
+        }
+        
+        access(self) fun simulateDapperNFTTransfer(params: {String: AnyStruct}): ActionResult {
+            let shouldFail = params["shouldFail"] as? Bool ?? false
+            let assetType = params["assetType"] as? String ?? "NBA_TOP_SHOT"
+            
+            if shouldFail {
+                return ActionResult(
+                    success: false,
+                    message: "Dapper NFT transfer failed: Receiver not configured",
+                    data: nil
+                )
+            }
+            
+            return ActionResult(
+                success: true,
+                message: "Dapper NFT transferred successfully",
+                data: {"assetType": assetType, "transferId": "transfer_789"}
+            )
+        }
+        
         access(self) fun handleSuccess(actionId: String, user: Address, targetAction: String) {
             let record = ActionRecord(
                 actionId: actionId,
@@ -199,14 +296,14 @@ access(all) contract InsuredAction {
             
             InsuredAction.totalActionsSucceeded = InsuredAction.totalActionsSucceeded + 1
             
-            emit Events.ActionSuccessEvent(
+            emit ActionSuccessEvent(
                 user: user,
                 actionId: actionId,
                 targetAction: targetAction,
                 timestamp: getCurrentBlock().timestamp
             )
             
-            emit Events.TransactionStatusEvent(
+            emit TransactionStatusEvent(
                 user: user,
                 actionId: actionId,
                 status: "SUCCESS",
@@ -225,7 +322,7 @@ access(all) contract InsuredAction {
         ) {
             let currentRetries = self.actionRecords[actionId]?.retries ?? 0
             
-            emit Events.ActionFailureEvent(
+            emit ActionFailureEvent(
                 user: user,
                 actionId: actionId,
                 targetAction: targetAction,
@@ -275,14 +372,14 @@ access(all) contract InsuredAction {
             
             InsuranceVault.payOut(user: user, amount: InsuredAction.defaultCompensationAmount)
             
-            emit Events.CompensationEvent(
+            emit CompensationEvent(
                 user: user,
                 actionId: actionId,
                 amount: InsuredAction.defaultCompensationAmount,
                 timestamp: getCurrentBlock().timestamp
             )
             
-            emit Events.TransactionStatusEvent(
+            emit TransactionStatusEvent(
                 user: user,
                 actionId: actionId,
                 status: "FAILED_COMPENSATED",
@@ -294,7 +391,8 @@ access(all) contract InsuredAction {
         access(all) fun executeScheduledRetry(actionId: String): ActionResult {
             let schedulerRef = Scheduler.borrowSchedulerManager()
             
-            guard let scheduledAction = schedulerRef.getScheduledAction(actionId: actionId) else {
+            let scheduledAction = schedulerRef.getScheduledAction(actionId: actionId)
+            if scheduledAction == nil {
                 return ActionResult(
                     success: false,
                     message: "Scheduled action not found",
@@ -314,10 +412,10 @@ access(all) contract InsuredAction {
             
             return self.executeAction(
                 actionId: actionId,
-                user: scheduledAction.user,
-                targetAction: scheduledAction.targetAction,
-                params: scheduledAction.params,
-                retryLimit: scheduledAction.retryLimit
+                user: scheduledAction!.user,
+                targetAction: scheduledAction!.targetAction,
+                params: scheduledAction!.params,
+                retryLimit: scheduledAction!.retryLimit
             )
         }
         
@@ -353,11 +451,16 @@ access(all) contract InsuredAction {
         }
     }
     
+    access(all) fun getInsuranceFee(user: Address): UFix64 {
+        return FrothRewards.calculateDiscountedFee(baseFee: self.defaultInsuranceFee, user: user)
+    }
+    
     init() {
         self.ActionManagerStoragePath = /storage/FlowSureActionManager
         
         self.defaultRetryDelay = 60.0
         self.defaultCompensationAmount = 1.0
+        self.defaultInsuranceFee = 0.5
         self.totalActionsExecuted = 0
         self.totalActionsSucceeded = 0
         self.totalActionsFailed = 0

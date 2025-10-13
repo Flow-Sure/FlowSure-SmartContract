@@ -51,4 +51,58 @@ access(all) contract Events {
         remainingBalance: UFix64,
         timestamp: UFix64
     )
+    
+    access(all) event FrothStakedEvent(
+        user: Address,
+        amount: UFix64,
+        totalStaked: UFix64,
+        timestamp: UFix64
+    )
+    
+    access(all) event FrothUnstakedEvent(
+        user: Address,
+        amount: UFix64,
+        remainingStaked: UFix64,
+        timestamp: UFix64
+    )
+    
+    access(all) event PremiumDiscountAppliedEvent(
+        user: Address,
+        discount: UFix64,
+        baseFee: UFix64,
+        finalFee: UFix64,
+        timestamp: UFix64
+    )
+    
+    access(all) event DapperAssetProtectedEvent(
+        user: Address,
+        assetType: String,
+        assetId: UInt64,
+        actionId: String,
+        timestamp: UFix64
+    )
+    
+    access(all) event DapperAssetCompensatedEvent(
+        user: Address,
+        assetType: String,
+        assetId: UInt64,
+        compensation: UFix64,
+        timestamp: UFix64
+    )
+    
+    access(all) event DapperActionSuccessEvent(
+        user: Address,
+        assetType: String,
+        assetId: UInt64,
+        actionType: String,
+        timestamp: UFix64
+    )
+    
+    access(all) event DapperActionRetryEvent(
+        user: Address,
+        assetType: String,
+        assetId: UInt64,
+        retryCount: UInt8,
+        timestamp: UFix64
+    )
 }

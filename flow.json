@@ -1,8 +1,9 @@
 {
   "contracts": {
-    "Events": "./contracts/Events.cdc",
     "InsuranceVault": "./contracts/InsuranceVault.cdc",
     "Scheduler": "./contracts/Scheduler.cdc",
+    "FrothRewards": "./contracts/FrothRewards.cdc",
+    "DapperAssetProtection": "./contracts/DapperAssetProtection.cdc",
     "InsuredAction": "./contracts/InsuredAction.cdc",
     "FungibleToken": {
       "source": "mainnet://0xf233dcee88fe0abe.FungibleToken",
@@ -30,30 +31,32 @@
       "key": "ae1b44c0f5e8f6992ef2348898a35e50a8b0b9684000da483c3fb0e91e3a0a4b"
     },
     "testnet-account": {
-      "address": "SERVICE_ACCOUNT_ADDRESS",
+      "address": "0x8401ed4fc6788c8a",
       "key": {
         "type": "hex",
         "index": 0,
-        "signatureAlgorithm": "ECDSA_P256",
-        "hashAlgorithm": "SHA3_256",
-        "privateKey": "SERVICE_ACCOUNT_PRIVATE_KEY"
+        "signatureAlgorithm": "ECDSA_secp256k1",
+        "hashAlgorithm": "SHA2_256",
+        "privateKey": "ceafc7423fc2e625147d4c35de60e3843458ac30aba4ed1b1125fe893ca5f4b1"
       }
     }
   },
   "deployments": {
     "emulator": {
       "emulator-account": [
-        "Events",
         "InsuranceVault",
         "Scheduler",
+        "FrothRewards",
+        "DapperAssetProtection",
         "InsuredAction"
       ]
     },
     "testnet": {
       "testnet-account": [
-        "Events",
         "InsuranceVault",
         "Scheduler",
+        "FrothRewards",
+        "DapperAssetProtection",
         "InsuredAction"
       ]
     }

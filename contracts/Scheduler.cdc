@@ -1,6 +1,20 @@
-import Events from "./Events.cdc"
-
 access(all) contract Scheduler {
+    
+    access(all) event RetryScheduledEvent(
+        user: Address,
+        actionId: String,
+        attempt: UInt8,
+        scheduledFor: UFix64,
+        timestamp: UFix64
+    )
+    
+    access(all) event TransactionStatusEvent(
+        user: Address,
+        actionId: String,
+        status: String,
+        retries: UInt8,
+        timestamp: UFix64
+    )
     
     access(all) let SchedulerStoragePath: StoragePath
     
@@ -49,7 +63,7 @@ access(all) contract Scheduler {
             let currentRetries = self.actionRetryCount[actionId] ?? 0
             
             if currentRetries >= retryLimit {
-                emit Events.TransactionStatusEvent(
+                emit TransactionStatusEvent(
                     user: user,
                     actionId: actionId,
                     status: "RETRY_LIMIT_EXCEEDED",
@@ -76,7 +90,7 @@ access(all) contract Scheduler {
             
             self.scheduledActions[actionId] = scheduledAction
             
-            emit Events.RetryScheduledEvent(
+            emit RetryScheduledEvent(
                 user: user,
                 actionId: actionId,
                 attempt: newRetryCount,

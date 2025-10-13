@@ -1,8 +1,21 @@
-import FungibleToken from 0xFungibleToken
-import FlowToken from 0xFlowToken
-import Events from "./Events.cdc"
+import FungibleToken from "FungibleToken"
+import FlowToken from "FlowToken"
 
 access(all) contract InsuranceVault {
+    
+    access(all) event VaultDepositEvent(
+        depositor: Address,
+        amount: UFix64,
+        newBalance: UFix64,
+        timestamp: UFix64
+    )
+    
+    access(all) event VaultPayoutEvent(
+        recipient: Address,
+        amount: UFix64,
+        remainingBalance: UFix64,
+        timestamp: UFix64
+    )
     
     access(all) let VaultStoragePath: StoragePath
     access(all) let VaultPublicPath: PublicPath
@@ -38,7 +51,7 @@ access(all) contract InsuranceVault {
                 amount <= InsuranceVault.totalPoolBalance: "Insufficient vault balance"
             }
             
-            let vaultRef = InsuranceVault.account.storage.borrow<&FlowToken.Vault>(
+            let vaultRef = InsuranceVault.account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(
                 from: /storage/flowTokenVault
             ) ?? panic("Could not borrow vault reference")
             
@@ -56,15 +69,14 @@ access(all) contract InsuranceVault {
     }
     
     access(all) resource interface VaultPublic {
-        access(all) fun deposit(from: @{FungibleToken.Vault})
+        access(all) fun deposit(from: @{FungibleToken.Vault}, depositor: Address)
         access(all) fun getVaultStats(): VaultData
     }
     
     access(all) resource Vault: VaultPublic {
         
-        access(all) fun deposit(from: @{FungibleToken.Vault}) {
+        access(all) fun deposit(from: @{FungibleToken.Vault}, depositor: Address) {
             let amount = from.balance
-            let depositor = from.owner?.address ?? panic("Could not get depositor address")
             
             let vaultRef = InsuranceVault.account.storage.borrow<&FlowToken.Vault>(
                 from: /storage/flowTokenVault
@@ -75,7 +87,7 @@ access(all) contract InsuranceVault {
             InsuranceVault.totalPoolBalance = InsuranceVault.totalPoolBalance + amount
             InsuranceVault.totalDeposits = InsuranceVault.totalDeposits + amount
             
-            emit Events.VaultDepositEvent(
+            emit VaultDepositEvent(
                 depositor: depositor,
                 amount: amount,
                 newBalance: InsuranceVault.totalPoolBalance,
@@ -98,7 +110,7 @@ access(all) contract InsuranceVault {
             amount <= self.totalPoolBalance: "Insufficient vault balance for payout"
         }
         
-        let vaultRef = self.account.storage.borrow<&FlowToken.Vault>(
+        let vaultRef = self.account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(
             from: /storage/flowTokenVault
         ) ?? panic("Could not borrow vault reference")
         
@@ -114,7 +126,7 @@ access(all) contract InsuranceVault {
         self.totalPoolBalance = self.totalPoolBalance - amount
         self.totalPayouts = self.totalPayouts + amount
         
-        emit Events.VaultPayoutEvent(
+        emit VaultPayoutEvent(
             recipient: user,
             amount: amount,
             remainingBalance: self.totalPoolBalance,
