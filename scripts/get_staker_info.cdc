@@ -3,16 +3,16 @@ import FrothRewards from 0x8401ed4fc6788c8a
 access(all) fun main(address: Address): {String: AnyStruct} {
     let account = getAccount(address)
     
-    if let stakerCap = account.capabilities.get<&FrothRewards.FrothStaker>(
+    let stakerCap = account.capabilities.get<&FrothRewards.FrothStaker>(
         FrothRewards.StakerPublicPath
-    ) {
-        if let stakerRef = stakerCap.borrow() {
-            return {
-                "address": address,
-                "stakedAmount": stakerRef.getStakedAmount(),
-                "discount": stakerRef.getDiscount(),
-                "discountPercentage": stakerRef.getDiscount() * 100.0
-            }
+    )
+    
+    if let stakerRef = stakerCap.borrow() {
+        return {
+            "address": address,
+            "stakedAmount": stakerRef.getStakedAmount(),
+            "discount": stakerRef.getDiscount(),
+            "discountPercentage": stakerRef.getDiscount() * 100.0
         }
     }
     

@@ -1,7 +1,7 @@
 import FrothRewards from 0x8401ed4fc6788c8a
 
 transaction {
-    prepare(signer: auth(SaveValue, StorageCapabilities, Capabilities) &Account) {
+    prepare(signer: auth(SaveValue, BorrowValue, StorageCapabilities, Capabilities) &Account) {
         // Check if staker already exists
         if signer.storage.borrow<&FrothRewards.FrothStaker>(from: FrothRewards.StakerStoragePath) != nil {
             log("Staker already exists")

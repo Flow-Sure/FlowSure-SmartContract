@@ -1,7 +1,7 @@
 import DapperAssetProtection from 0x8401ed4fc6788c8a
 
 transaction {
-    prepare(signer: auth(SaveValue, StorageCapabilities, Capabilities) &Account) {
+    prepare(signer: auth(SaveValue, BorrowValue, StorageCapabilities, Capabilities) &Account) {
         // Check if protection manager already exists
         if signer.storage.borrow<&DapperAssetProtection.ProtectionManager>(
             from: DapperAssetProtection.ProtectionManagerStoragePath
