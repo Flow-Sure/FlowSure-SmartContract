@@ -1,64 +1,144 @@
 {
-  "contracts": {
-    "InsuranceVault": "./contracts/InsuranceVault.cdc",
-    "Scheduler": "./contracts/Scheduler.cdc",
-    "FrothRewards": "./contracts/FrothRewards.cdc",
-    "DapperAssetProtection": "./contracts/DapperAssetProtection.cdc",
-    "InsuredAction": "./contracts/InsuredAction.cdc",
-    "FungibleToken": {
-      "source": "mainnet://0xf233dcee88fe0abe.FungibleToken",
-      "aliases": {
-        "testnet": "0x9a0766d93b6608b7",
-        "emulator": "0xee82856bf20e2aa6"
-      }
-    },
-    "FlowToken": {
-      "source": "mainnet://0x1654653399040a61.FlowToken",
-      "aliases": {
-        "testnet": "0x7e60df042a9c0868",
-        "emulator": "0x0ae53cb6e3f42a79"
-      }
-    }
-  },
-  "networks": {
-    "emulator": "127.0.0.1:3569",
-    "mainnet": "access.mainnet.nodes.onflow.org:9000",
-    "testnet": "access.devnet.nodes.onflow.org:9000"
-  },
-  "accounts": {
-    "emulator-account": {
-      "address": "f8d6e0586b0a20c7",
-      "key": "ae1b44c0f5e8f6992ef2348898a35e50a8b0b9684000da483c3fb0e91e3a0a4b"
-    },
-    "testnet-account": {
-      "address": "0x8401ed4fc6788c8a",
-      "key": {
-        "type": "hex",
-        "index": 0,
-        "signatureAlgorithm": "ECDSA_secp256k1",
-        "hashAlgorithm": "SHA2_256",
-        "privateKey": "ceafc7423fc2e625147d4c35de60e3843458ac30aba4ed1b1125fe893ca5f4b1"
-      }
-    }
-  },
-  "deployments": {
-    "emulator": {
-      "emulator-account": [
-        "InsuranceVault",
-        "Scheduler",
-        "FrothRewards",
-        "DapperAssetProtection",
-        "InsuredAction"
-      ]
-    },
-    "testnet": {
-      "testnet-account": [
-        "InsuranceVault",
-        "Scheduler",
-        "FrothRewards",
-        "DapperAssetProtection",
-        "InsuredAction"
-      ]
-    }
-  }
+	"contracts": {
+		"DapperAssetProtection": "./contracts/DapperAssetProtection.cdc",
+		"FlowToken": {
+			"source": "mainnet://0x1654653399040a61.FlowToken",
+			"aliases": {
+				"emulator": "0ae53cb6e3f42a79",
+				"testnet": "7e60df042a9c0868"
+			}
+		},
+		"FrothRewards": "./contracts/FrothRewards.cdc",
+		"FungibleToken": {
+			"source": "mainnet://0xf233dcee88fe0abe.FungibleToken",
+			"aliases": {
+				"emulator": "ee82856bf20e2aa6",
+				"testnet": "9a0766d93b6608b7"
+			}
+		},
+		"InsuranceVault": "./contracts/InsuranceVault.cdc",
+		"InsuredAction": "./contracts/InsuredAction.cdc",
+		"Scheduler": "./contracts/Scheduler.cdc"
+	},
+	"dependencies": {
+		"Burner": {
+			"source": "mainnet://f233dcee88fe0abe.Burner",
+			"hash": "71af18e227984cd434a3ad00bb2f3618b76482842bae920ee55662c37c8bf331",
+			"aliases": {
+				"emulator": "f8d6e0586b0a20c7",
+				"mainnet": "f233dcee88fe0abe",
+				"testnet": "9a0766d93b6608b7"
+			}
+		},
+		"CapabilityDelegator": {
+			"source": "mainnet://d8a7e05a7ac670c0.CapabilityDelegator",
+			"hash": "ad3bf8671a74a836b428da7840540c0ce419349be5f6410b18546e9a9217a9d2",
+			"aliases": {
+				"mainnet": "d8a7e05a7ac670c0",
+				"testnet": "294e44e1ec6993c6"
+			}
+		},
+		"CapabilityFactory": {
+			"source": "mainnet://d8a7e05a7ac670c0.CapabilityFactory",
+			"hash": "33d6b142c1db548a193cc06ff9828a24ca2ff8726301e292a8b6863dd0e1e73e",
+			"aliases": {
+				"mainnet": "d8a7e05a7ac670c0",
+				"testnet": "294e44e1ec6993c6"
+			}
+		},
+		"CapabilityFilter": {
+			"source": "mainnet://d8a7e05a7ac670c0.CapabilityFilter",
+			"hash": "77b59eb8245102a84a49d47a67e83eeeaafea920b120cdd6aa175d9ff120c388",
+			"aliases": {
+				"mainnet": "d8a7e05a7ac670c0",
+				"testnet": "294e44e1ec6993c6"
+			}
+		},
+		"FungibleToken": {
+			"source": "mainnet://f233dcee88fe0abe.FungibleToken",
+			"hash": "23c1159cf99b2b039b6b868d782d57ae39b8d784045d81597f100a4782f0285b",
+			"aliases": {}
+		},
+		"HybridCustody": {
+			"source": "mainnet://d8a7e05a7ac670c0.HybridCustody",
+			"hash": "c8a129eec11c57ee25487fcce38efc54c3b12eb539ba61a52f4ee620173bb67b",
+			"aliases": {
+				"mainnet": "d8a7e05a7ac670c0",
+				"testnet": "294e44e1ec6993c6"
+			}
+		},
+		"MetadataViews": {
+			"source": "mainnet://1d7e57aa55817448.MetadataViews",
+			"hash": "9032f46909e729d26722cbfcee87265e4f81cd2912e936669c0e6b510d007e81",
+			"aliases": {
+				"emulator": "f8d6e0586b0a20c7",
+				"mainnet": "1d7e57aa55817448",
+				"testnet": "631e88ae7f1d7c20"
+			}
+		},
+		"NonFungibleToken": {
+			"source": "mainnet://1d7e57aa55817448.NonFungibleToken",
+			"hash": "b63f10e00d1a814492822652dac7c0574428a200e4c26cb3c832c4829e2778f0",
+			"aliases": {
+				"emulator": "f8d6e0586b0a20c7",
+				"mainnet": "1d7e57aa55817448",
+				"testnet": "631e88ae7f1d7c20"
+			}
+		},
+		"ViewResolver": {
+			"source": "mainnet://1d7e57aa55817448.ViewResolver",
+			"hash": "374a1994046bac9f6228b4843cb32393ef40554df9bd9907a702d098a2987bde",
+			"aliases": {
+				"emulator": "f8d6e0586b0a20c7",
+				"mainnet": "1d7e57aa55817448",
+				"testnet": "631e88ae7f1d7c20"
+			}
+		}
+	},
+	"networks": {
+		"emulator": "127.0.0.1:3569",
+		"mainnet": "access.mainnet.nodes.onflow.org:9000",
+		"testnet": "access.devnet.nodes.onflow.org:9000"
+	},
+	"accounts": {
+		"emulator-account": {
+			"address": "f8d6e0586b0a20c7",
+			"key": "ae1b44c0f5e8f6992ef2348898a35e50a8b0b9684000da483c3fb0e91e3a0a4b"
+		},
+		"testnet-account": {
+			"address": "8401ed4fc6788c8a",
+			"key": {
+				"type": "hex",
+				"signatureAlgorithm": "ECDSA_secp256k1",
+				"hashAlgorithm": "SHA2_256",
+				"privateKey": "ceafc7423fc2e625147d4c35de60e3843458ac30aba4ed1b1125fe893ca5f4b1"
+			}
+		}
+	},
+	"deployments": {
+		"emulator": {
+			"emulator-account": [
+				"InsuranceVault",
+				"Scheduler",
+				"FrothRewards",
+				"DapperAssetProtection",
+				"InsuredAction"
+			],
+			"testnet-account": [
+				"HybridCustody",
+				"CapabilityFactory",
+				"CapabilityDelegator",
+				"CapabilityFilter"
+			]
+		},
+		"testnet": {
+			"testnet-account": [
+				"InsuranceVault",
+				"Scheduler",
+				"FrothRewards",
+				"DapperAssetProtection",
+				"InsuredAction"
+			]
+		}
+	}
 }

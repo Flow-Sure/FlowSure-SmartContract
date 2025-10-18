@@ -138,6 +138,13 @@ access(all) contract Scheduler {
         ) ?? panic("Could not borrow SchedulerManager reference")
     }
     
+    access(all) fun getAllScheduledActions(): [ScheduledAction] {
+        let schedulerRef = self.account.storage.borrow<&SchedulerManager>(
+            from: self.SchedulerStoragePath
+        ) ?? panic("Could not borrow SchedulerManager reference")
+        return schedulerRef.getAllScheduledActions()
+    }
+    
     init() {
         self.SchedulerStoragePath = /storage/FlowSureScheduler
         
