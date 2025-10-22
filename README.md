@@ -10,12 +10,15 @@ FlowSure wraps on-chain actions (token swaps, NFT mints, transfers, Dapper NFT o
 
 ### Core Contracts
 
-1. **Events.cdc** - Event definitions for system observability
-2. **InsuranceVault.cdc** - Manages pooled funds for user compensation
-3. **Scheduler.cdc** - Handles retry scheduling and execution
-4. **FrothRewards.cdc** - $FROTH token staking and premium discount system
+1. **Events.cdc** - Event definitions for observability
+2. **InsuranceVault.cdc** - Insurance pool and payouts
+3. **Scheduler.cdc** - Retry scheduling and execution
+4. **FrothRewardsV2.cdc** - $FROTH staking with tiered fee discounts
 5. **DapperAssetProtection.cdc** - Dapper NFT insurance and protection
-6. **InsuredAction.cdc** - Main wrapper for executing insured actions with discount integration
+6. **InsuredAction.cdc** - Wrapper for insured actions and discounts
+7. **ScheduledTransfer.cdc** - Scheduled transfers (deployed from scheduler account)
+8. **FlowSureActions.cdc** - Shared action helpers and types
+9. **AutoCompound.cdc** - Optional auto-compounding of rewards
 
 ### Workflow
 
@@ -65,6 +68,8 @@ flow project deploy --network=emulator
 flow project deploy --network=testnet
 ```
 
+Note: Uses `FlowTransactionScheduler` on testnet (`0x8c5303eaa26202d6`) as referenced in `flow.json`.
+
 **Testnet Deployment Status:**
 - Account Address: `0x8401ed4fc6788c8a`
 - Network: Flow Testnet
@@ -89,23 +94,44 @@ FlowSure-SmartContract/
 │   ├── Events.cdc                    # Event definitions
 │   ├── InsuranceVault.cdc            # Insurance pool management
 │   ├── Scheduler.cdc                 # Retry scheduling logic
-│   ├── FrothRewards.cdc              # $FROTH staking and rewards
+│   ├── ScheduledTransfer.cdc         # Scheduled transfer orchestration
+│   ├── FrothRewardsV2.cdc            # $FROTH staking (v2)
 │   ├── DapperAssetProtection.cdc     # Dapper NFT insurance
-│   └── InsuredAction.cdc             # Main action wrapper
+│   ├── InsuredAction.cdc             # Main action wrapper
+│   ├── FlowSureActions.cdc           # Shared action helpers
+│   ├── AutoCompound.cdc              # Auto-compounding (optional)
+│   ├── connectors/
+│   │   └── IncrementFiConnector.cdc  # DEX connector (IncrementFi)
+│   └── interfaces/
+│       └── IFlowSureAction.cdc       # Action interface/types
 ├── transactions/
-│   ├── deposit_to_vault.cdc          # Fund insurance vault
-│   ├── execute_insured_action.cdc    # Execute insured action
-│   └── execute_scheduled_retry.cdc   # Manually trigger retry
+│   ├── deposit_to_vault.cdc
+│   ├── execute_insured_action.cdc
+│   ├── execute_insured_swap_action.cdc
+│   ├── execute_insured_transfer_action.cdc
+│   ├── schedule_transfer.cdc
+│   ├── create_scheduled_transfer_auth_v2.cdc
+│   ├── execute_scheduled_transfer_v2.cdc
+│   └── ...
 ├── scripts/
-│   ├── get_vault_stats.cdc           # Query vault statistics
-│   ├── get_action_record.cdc         # Get action details
-│   ├── get_all_actions.cdc           # List all actions
-│   ├── get_scheduled_actions.cdc     # List scheduled retries
-│   └── get_action_stats.cdc          # System statistics
+│   ├── get_vault_stats.cdc
+│   ├── get_action_record.cdc
+│   ├── get_all_actions.cdc
+│   ├── get_scheduled_actions.cdc
+│   ├── get_action_stats.cdc
+│   ├── get_staker_info.cdc
+│   ├── get_staking_summary.cdc
+│   ├── fetch_linked_nfts.cdc
+│   └── get_swap_quote.cdc
 ├── flow.json                         # Flow configuration
 ├── DEPLOYMENT.md                     # Deployment guide
 └── README.md                         # This file
 ```
+
+### Connectors & Interfaces
+
+- **`contracts/connectors/IncrementFiConnector.cdc`** – DEX connector used by swap transactions.
+- **`contracts/interfaces/IFlowSureAction.cdc`** – Common action interface/types for `InsuredAction.cdc` and `FlowSureActions.cdc`.
 
 ## 💡 Usage Examples
 
@@ -129,6 +155,36 @@ flow transactions send ./transactions/execute_insured_action.cdc \
 # Execute a failing action (will retry and compensate)
 flow transactions send ./transactions/execute_insured_action.cdc \
   "nft_mint" true 3 \
+  --signer testnet-account \
+  --network testnet
+```
+
+### Schedule a Transfer (v2)
+
+```bash
+# Create/update auth for scheduled transfers
+flow transactions send ./transactions/create_scheduled_transfer_auth_v2.cdc \
+  --signer testnet-account \
+  --network testnet
+
+# Schedule a transfer
+flow transactions send ./transactions/schedule_transfer.cdc \
+  "<recipient>" "<amount>" \
+  --signer testnet-account \
+  --network testnet
+
+# Execute (scheduler account)
+flow transactions send ./transactions/execute_scheduled_transfer_v2.cdc \
+  "<actionId>" \
+  --signer testnet-scheduler-account \
+  --network testnet
+```
+
+### Execute an Insured DEX Swap
+
+```bash
+flow transactions send ./transactions/execute_insured_swap_action.cdc \
+  "<pool>" "<tokenIn>" "<tokenOut>" "<amountIn>" \
   --signer testnet-account \
   --network testnet
 ```
@@ -376,41 +432,3 @@ flow scripts execute ./scripts/get_vault_stats.cdc --network testnet
 - Track staking, unstaking, and discount applications
 - Monitor Dapper asset protection and compensations
 - Real-time observability for all system operations
-
-## 🛣️ Roadmap
-
-- [x] $FROTH token staking and rewards
-- [x] Dapper NFT protection (Top Shot, All Day, Disney Pinnacle)
-- [x] Automatic retry mechanism
-- [x] Insurance compensation system
-- [ ] Integration with Forte Scheduled Transactions
-- [ ] Dynamic compensation calculation based on action value
-- [ ] Additional Dapper assets (UFC Strike, etc.)
-- [ ] Governance mechanism for parameter updates
-- [ ] Frontend dashboard and UI
-- [ ] Cross-chain asset protection
-
-## 📚 Resources
-
-- [Flow Documentation](https://developers.flow.com/)
-- [Cadence Language](https://developers.flow.com/cadence/language)
-- [FLIP-338: Flow Actions](https://github.com/onflow/flips)
-- [Deployment Guide](./DEPLOYMENT.md)
-
-## 🤝 Contributing
-
-Contributions welcome! Please read the contributing guidelines before submitting PRs.
-
-## 📄 License
-
-MIT License - see LICENSE file for details
-
-## 🆘 Support
-
-For issues and questions:
-- Open an issue on GitHub
-- Check [DEPLOYMENT.md](./DEPLOYMENT.md) for troubleshooting
-
----
-
-Built with ❤️ for the Flow blockchain ecosystem
