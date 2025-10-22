@@ -1,10 +1,10 @@
 # FlowSure Smart Contracts
 
-FlowSure provides insured on-chain actions with automatic retry logic, insurance compensation, $FROTH token staking rewards, and Dapper NFT protection. The system automatically retries failed transactions and compensates users when retries are exhausted.
+FlowSure provides insured on-chain actions with automatic retry logic, insurance compensation, $FROTH or $FLOW token staking rewards, and Dapper NFT protection. The system automatically retries failed transactions and compensates users when retries are exhausted.
 
 ## 🎯 Overview
 
-FlowSure wraps on-chain actions (token swaps, NFT mints, transfers, Dapper NFT operations) with automatic retry logic and insurance compensation. Users can stake $FROTH tokens to receive premium discounts on insurance fees. The platform also provides comprehensive protection for Dapper NFT operations including NBA Top Shot, NFL All Day, and Disney Pinnacle.
+FlowSure wraps on-chain actions (token swaps, NFT mints, transfers, Dapper NFT operations) with automatic retry logic and insurance compensation. Users can stake $FROTH or $FLOW tokens to receive premium discounts on insurance fees. The platform also provides comprehensive protection for Dapper NFT operations including NBA Top Shot, NFL All Day, and Disney Pinnacle.
 
 ## 🧩 Architecture
 
