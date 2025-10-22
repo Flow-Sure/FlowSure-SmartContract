@@ -8,7 +8,15 @@
 				"testnet": "7e60df042a9c0868"
 			}
 		},
+		"FlowTransactionScheduler": {
+			"source": "testnet://0x8c5303eaa26202d6.FlowTransactionScheduler",
+			"aliases": {
+				"emulator": "f8d6e0586b0a20c7",
+				"testnet": "8c5303eaa26202d6"
+			}
+		},
 		"FrothRewards": "./contracts/FrothRewards.cdc",
+		"FrothRewardsV2": "./contracts/FrothRewardsV2.cdc",
 		"FungibleToken": {
 			"source": "mainnet://0xf233dcee88fe0abe.FungibleToken",
 			"aliases": {
@@ -18,6 +26,7 @@
 		},
 		"InsuranceVault": "./contracts/InsuranceVault.cdc",
 		"InsuredAction": "./contracts/InsuredAction.cdc",
+		"ScheduledTransfer": "./contracts/ScheduledTransfer.cdc",
 		"Scheduler": "./contracts/Scheduler.cdc"
 	},
 	"dependencies": {
@@ -103,15 +112,23 @@
 	"accounts": {
 		"emulator-account": {
 			"address": "f8d6e0586b0a20c7",
-			"key": "ae1b44c0f5e8f6992ef2348898a35e50a8b0b9684000da483c3fb0e91e3a0a4b"
+			"key": {
+				"type": "file",
+				"location": "./emulator-account.pkey"
+			}
 		},
 		"testnet-account": {
 			"address": "8401ed4fc6788c8a",
 			"key": {
-				"type": "hex",
-				"signatureAlgorithm": "ECDSA_secp256k1",
-				"hashAlgorithm": "SHA2_256",
-				"privateKey": "ceafc7423fc2e625147d4c35de60e3843458ac30aba4ed1b1125fe893ca5f4b1"
+				"type": "file",
+				"location": "./testnet-account.pkey"
+			}
+		},
+		"testnet-scheduler-account": {
+			"address": "fe1ad3a05230e532",
+			"key": {
+				"type": "file",
+				"location": "./testnet-scheduler-account.pkey"
 			}
 		}
 	},
@@ -135,9 +152,12 @@
 			"testnet-account": [
 				"InsuranceVault",
 				"Scheduler",
-				"FrothRewards",
+				"FrothRewardsV2",
 				"DapperAssetProtection",
 				"InsuredAction"
+			],
+			"testnet-scheduler-account": [
+				"ScheduledTransfer"
 			]
 		}
 	}

@@ -1,6 +1,6 @@
 import InsuranceVault from "./InsuranceVault.cdc"
 import Scheduler from "./Scheduler.cdc"
-import FrothRewards from "./FrothRewards.cdc"
+import FrothRewardsV2 from "./FrothRewardsV2.cdc"
 import DapperAssetProtection from "./DapperAssetProtection.cdc"
 
 access(all) contract InsuredAction {
@@ -95,7 +95,7 @@ access(all) contract InsuredAction {
             retryLimit: UInt8
         ): String {
             let baseFee = InsuredAction.defaultInsuranceFee
-            let finalFee = FrothRewards.calculateDiscountedFee(baseFee: baseFee, user: user)
+            let finalFee = FrothRewardsV2.calculateDiscountedFee(baseFee: baseFee, user: user)
             self.actionCounter = self.actionCounter + 1
             let actionId = "action_".concat(self.actionCounter.toString())
             
@@ -452,7 +452,7 @@ access(all) contract InsuredAction {
     }
     
     access(all) fun getInsuranceFee(user: Address): UFix64 {
-        return FrothRewards.calculateDiscountedFee(baseFee: self.defaultInsuranceFee, user: user)
+        return FrothRewardsV2.calculateDiscountedFee(baseFee: self.defaultInsuranceFee, user: user)
     }
     
     init() {

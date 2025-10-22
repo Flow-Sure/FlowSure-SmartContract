@@ -73,9 +73,10 @@ flow project deploy --network=testnet
 **Deployed Contracts:**
 - InsuranceVault: `0x8401ed4fc6788c8a`
 - Scheduler: `0x8401ed4fc6788c8a`
-- FrothRewards: `0x8401ed4fc6788c8a`
+- FrothRewardsV2: `0x8401ed4fc6788c8a`
 - DapperAssetProtection: `0x8401ed4fc6788c8a`
 - InsuredAction: `0x8401ed4fc6788c8a`
+- ScheduledTransfer: `0xfe1ad3a05230e532`
 - Events: `0x8401ed4fc6788c8a` (legacy - events now in individual contracts)
 
 See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.

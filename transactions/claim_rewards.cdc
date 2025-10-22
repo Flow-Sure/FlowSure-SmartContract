@@ -2,7 +2,7 @@ import FungibleToken from 0x9a0766d93b6608b7
 import FlowToken from 0x7e60df042a9c0868
 import FrothRewardsV2 from 0x8401ed4fc6788c8a
 
-transaction(amount: UFix64) {
+transaction {
     let stakerRef: &FrothRewardsV2.FrothStaker
     let flowVault: &FlowToken.Vault
     
@@ -17,9 +17,14 @@ transaction(amount: UFix64) {
     }
     
     execute {
-        let tokens <- self.stakerRef.unstake(amount: amount)
-        self.flowVault.deposit(from: <-tokens)
-        log("Successfully unstaked ".concat(amount.toString()).concat(" FLOW"))
-        log("Remaining staked: ".concat(self.stakerRef.getStakedAmount().toString()))
+        let pendingRewards = self.stakerRef.calculatePendingRewards()
+        
+        if pendingRewards > 0.0 {
+            let rewardTokens <- self.stakerRef.claimRewards()
+            self.flowVault.deposit(from: <-rewardTokens)
+            log("Successfully claimed ".concat(pendingRewards.toString()).concat(" FLOW in rewards"))
+        } else {
+            log("No rewards available to claim")
+        }
     }
 }

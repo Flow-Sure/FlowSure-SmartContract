@@ -1,7 +1,7 @@
 import FungibleToken from "FungibleToken"
 import FlowToken from "FlowToken"
 
-access(all) contract FrothRewards {
+access(all) contract FrothRewardsV2 {
     
     access(all) event FrothStakedEvent(
         user: Address,
@@ -80,10 +80,10 @@ access(all) contract FrothRewards {
             
             if previousAmount == 0.0 {
                 self.stakedAt = getCurrentBlock().timestamp
-                FrothRewards.totalStakers = FrothRewards.totalStakers + 1
+                FrothRewardsV2.totalStakers = FrothRewardsV2.totalStakers + 1
             }
             
-            FrothRewards.totalStaked = FrothRewards.totalStaked + amount
+            FrothRewardsV2.totalStaked = FrothRewardsV2.totalStaked + amount
             
             emit FrothStakedEvent(
                 user: self.owner?.address ?? panic("No owner"),
@@ -100,10 +100,10 @@ access(all) contract FrothRewards {
             }
             
             self.stakedAmount = self.stakedAmount - amount
-            FrothRewards.totalStaked = FrothRewards.totalStaked - amount
+            FrothRewardsV2.totalStaked = FrothRewardsV2.totalStaked - amount
             
             if self.stakedAmount == 0.0 {
-                FrothRewards.totalStakers = FrothRewards.totalStakers - 1
+                FrothRewardsV2.totalStakers = FrothRewardsV2.totalStakers - 1
             }
             
             emit FrothUnstakedEvent(
@@ -147,7 +147,7 @@ access(all) contract FrothRewards {
             let stakingDuration = currentTime - self.stakedAt
             let secondsPerYear: UFix64 = 31536000.0
             
-            let rewards = self.stakedAmount * FrothRewards.annualRewardRate * stakingDuration / secondsPerYear
+            let rewards = self.stakedAmount * FrothRewardsV2.annualRewardRate * stakingDuration / secondsPerYear
             return rewards
         }
         
@@ -156,10 +156,10 @@ access(all) contract FrothRewards {
             assert(rewardAmount > 0.0, message: "No rewards to claim")
             
             self.stakedAt = getCurrentBlock().timestamp
-            FrothRewards.totalRewardsPaid = FrothRewards.totalRewardsPaid + rewardAmount
+            FrothRewardsV2.totalRewardsPaid = FrothRewardsV2.totalRewardsPaid + rewardAmount
             
-            let rewardsVault = FrothRewards.account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(
-                from: FrothRewards.RewardsVaultStoragePath
+            let rewardsVault = FrothRewardsV2.account.storage.borrow<auth(FungibleToken.Withdraw) &FlowToken.Vault>(
+                from: FrothRewardsV2.RewardsVaultStoragePath
             ) ?? panic("Could not borrow rewards vault")
             
             emit RewardsClaimed(
@@ -238,10 +238,10 @@ access(all) contract FrothRewards {
     }
     
     init() {
-        self.StakerStoragePath = /storage/FlowSureFrothStaker
-        self.StakerPublicPath = /public/FlowSureFrothStaker
-        self.StakingVaultStoragePath = /storage/FlowSureStakingVault
-        self.RewardsVaultStoragePath = /storage/FlowSureRewardsVault
+        self.StakerStoragePath = /storage/FlowSureFrothStakerV2
+        self.StakerPublicPath = /public/FlowSureFrothStakerV2
+        self.StakingVaultStoragePath = /storage/FlowSureStakingVaultV2
+        self.RewardsVaultStoragePath = /storage/FlowSureRewardsVaultV2
         
         self.totalStaked = 0.0
         self.totalStakers = 0
